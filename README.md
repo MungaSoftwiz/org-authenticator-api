@@ -1,6 +1,7 @@
-# Org-auth-api
+# Org-authenticator-api
 
-This project implements a user authentication and organisation management system using a backend framework of your choice. The API supports user registration, login, and organisation management functionalities.
+This project implements a user authentication and organisation management system using Go.
+The API supports user registration, login, and organisation management functionalities.
 
 ## Table of Contents
 
@@ -9,11 +10,7 @@ This project implements a user authentication and organisation management system
 - [Database Setup](#database-setup)
 - [Models](#models)
 - [Endpoints](#endpoints)
-- [Validation](#validation)
-- [Error Handling](#error-handling)
 - [Testing](#testing)
-- [Deployment](#deployment)
-- [Submission](#submission)
 
 ## Features
 
@@ -63,13 +60,11 @@ This project implements a user authentication and organisation management system
 
 ## Endpoints
 
-User Authentication
-
-Register User
+### User Authentication & Register User
 
 Endpoint: POST /auth/register
 
-Request Body:
+**Request Body:**
 
 ```json
 {
@@ -81,7 +76,7 @@ Request Body:
 }
 ```
 
-Successful Response:
+**Successful Response:**
 
 ```json
 {
@@ -100,7 +95,7 @@ Successful Response:
 }
 ```
 
-Unsuccessful Response:
+**Unsuccessful Response:**
 
 ```json
 {
@@ -110,11 +105,11 @@ Unsuccessful Response:
 }
 ```
 
-Login User
+### Login User
 
 Endpoint: POST /auth/login
 
-Request Body:
+**Request Body:**
 
 ```json
 {
@@ -123,7 +118,7 @@ Request Body:
 }
 ```
 
-Successful Response:
+**Successful Response:**
 
 ```json
 {
@@ -142,7 +137,7 @@ Successful Response:
 }
 ```
 
-Unsuccessful Response:
+**Unsuccessful Response:**
 
 ```json
 {
@@ -152,13 +147,13 @@ Unsuccessful Response:
 }
 ```
 
-User Endpoints
+## User Endpoints
 
-Get User Details
+### Get User Details
 
 Endpoint: GET /api/users/:id
 
-Successful Response:
+**Successful Response:**
 
 ```json
 {
@@ -174,13 +169,13 @@ Successful Response:
 }
 ```
 
-Organisation Endpoints
+## Organisation Endpoints
 
-Get All Organisations
+### Get All Organisations
 
 Endpoint: GET /api/organisations
 
-Successful Response:
+**Successful Response:**
 
 ```json
 {
@@ -198,11 +193,11 @@ Successful Response:
 }
 ```
 
-Get Single Organisation
+### Get Single Organisation
 
 Endpoint: GET /api/organisations/:orgId
 
-Successful Response:
+**Successful Response:**
 
 ```json
 {
@@ -216,11 +211,11 @@ Successful Response:
 }
 ```
 
-Create Organisation
+### Create Organisation
 
 Endpoint: POST /api/organisations
 
-Request Body:
+**Request Body:**
 
 ```json
 {
@@ -229,7 +224,7 @@ Request Body:
 }
 ```
 
-Successful Response:
+**Successful Response:**
 
 ```json
 {
@@ -243,7 +238,7 @@ Successful Response:
 }
 ```
 
-Unsuccessful Response:
+**Unsuccessful Response:**
 
 ```json
 {
@@ -253,11 +248,11 @@ Unsuccessful Response:
 }
 ```
 
-Add User to Organisation
+### Add User to Organisation
 
 Endpoint: POST /api/organisations/:orgId/users
 
-Request Body:
+**Request Body:**
 
 ```json
 {
@@ -265,7 +260,7 @@ Request Body:
 }
 ```
 
-Successful Response:
+**Successful Response:**
 
 ```json
 {
@@ -274,19 +269,19 @@ Successful Response:
 }
 ```
 
-Testing
+## Testing
 
-Unit Testing
+- Unit Testing
 
-Token generation: Ensure token expires at the correct time and correct user details are found in token.
+- Token generation: Ensure token expires at the correct time and correct user details are found in token.
 
-Organisation: Ensure users can’t see data from organisations they don’t have access to.
+- Organisation: Ensure users can’t see data from organisations they don’t have access to.
 
-End-to-End Test Requirements for the Register Endpoint
+- End-to-End Test Requirements for the Register Endpoint
 
-Directory Structure: Create a tests folder with the test file named auth.spec.ext.
+- Directory Structure: Create a tests folder with the test file named `auth.spec.ext`.
 
-Test Scenarios:
+### Test Scenarios:
 
 - Register user successfully with default organisation.
 - Log the user in successfully.
