@@ -7,7 +7,6 @@ import (
 )
 
 type Handler struct {
-
 }
 
 func NewHandler() *Handler {
@@ -20,9 +19,9 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
-		// handle login
+	// handle login
 }
 
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
-		// handle register
+	// handle register
 }
