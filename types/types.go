@@ -23,3 +23,22 @@ type RegisterUserPayload struct {
 	Password  string `json:"password" validate:"required,min=8,max=32"`
 	Phone     string `json:"phone" validate:"required"`
 }
+
+type LoginUserPayload struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=8,max=32"`
+}
+
+// Organisation Model
+type Organisation struct {
+	OrgID       string `json:"orgId" db:"orgId"`
+	Name        string `json:"name" db:"name"`
+	Description string `json:"description" db:"description"`
+}
+
+type OrganisationStorage interface {
+	GetAllOrganisations() ([]Organisation, error)
+	GetOrganisationByID(id string) (*Organisation, error)
+	CreateOrganisation(Organisation) error
+	AddUserToOrganisation(orgID, userID string) error
+}
