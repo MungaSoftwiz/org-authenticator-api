@@ -1,15 +1,15 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 
 	"github.com/MungaSoftwiz/org-authenticator-api/cmd/api"
 	"github.com/MungaSoftwiz/org-authenticator-api/config"
 	"github.com/MungaSoftwiz/org-authenticator-api/db"
+	"github.com/jmoiron/sqlx"
 )
 
-func initStorage(db *sql.DB) {
+func initStorage(db *sqlx.DB) {
 	err := db.Ping()
 	if err != nil {
 		log.Fatal(err)
@@ -32,7 +32,7 @@ func main() {
 
 	initStorage(db)
 
-	server := api.NewAPIServer(":8080", db)
+	server := api.NewAPIServer(":8080", sqlx.NewDb(db.DB, "postgres"))
 	if err := server.Run(); err != nil {
 		log.Fatal(err)
 	}
