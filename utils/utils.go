@@ -10,7 +10,6 @@ import (
 var Validate = validator.New()
 
 func ReadJSON(r *http.Request, payload any) error {
-	defer r.Body.Close()
 	if r.Body == nil {
 		return fmt.Errorf("request body is empty")
 	}
