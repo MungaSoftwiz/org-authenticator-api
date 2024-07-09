@@ -21,12 +21,68 @@ func NewHandler(storage types.UserStorage) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/login", h.handleLogin).Methods("POST")
+	router.HandleFunc("/auth/login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/register", h.handleRegister).Methods("POST")
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
-	// handle login
+	var payload types.LoginUserPayload
+
+	if err := utils.ReadJSON(r, &payload); err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, map[string]interface{}{
+			"status":     "Bad request",
+			"message":    "Invalid payload",
+			"statusCode": 400,
+		})
+		return
+	}
+
+	// Validate the payload
+	if err := utils.Validate.Struct(&payload); err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, map[string]interface{}{
+			"status":     "Bad request",
+			"message":    "Validation failed",
+			"statusCode": 400,
+		})
+		return
+	}
+
+	user, err := h.storage.GetUserByEmail(payload.Email)
+	if err != nil || !auth.CheckPasswordHash(payload.Password, user.Password) {
+		utils.WriteJSON(w, http.StatusUnauthorized, map[string]interface{}{
+			"status":     "Bad request",
+			"message":    "Authentication failed",
+			"statusCode": 401,
+		})
+		return
+	}
+
+	token, err := auth.GenerateToken(strconv.Itoa(user.ID))
+	if err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, map[string]interface{}{
+			"status":     "error",
+			"message":    "Could not generate token",
+			"statusCode": 500,
+		})
+		return
+	}
+
+	response := map[string]interface{}{
+		"status":  "success",
+		"message": "Login successful",
+		"data": map[string]interface{}{
+			"accessToken": token,
+			"user": map[string]interface{}{
+				"userId":    user.ID,
+				"firstName": user.FirstName,
+				"lastName":  user.LastName,
+				"email":     user.Email,
+				"phone":     user.Phone,
+			},
+		},
+	}
+
+	utils.WriteJSON(w, http.StatusOK, response)
 }
 
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {

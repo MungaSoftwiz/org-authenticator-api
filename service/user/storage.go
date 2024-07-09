@@ -13,6 +13,7 @@ func NewStorage(db *sqlx.DB) *Storage {
 	return &Storage{db: db}
 }
 
+// User model methods
 func (s *Storage) CreateUser(user types.User) error {
 	_, err := s.db.Exec("INSERT INTO users (firstName, lastName, email, password, phone) VALUES (?, ?, ?, ?, ?)", user.FirstName, user.LastName, user.Email, user.Password, user.Phone)
 	if err != nil {
