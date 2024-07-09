@@ -28,11 +28,11 @@ func initConfig() PostgreSQLConfig {
 
 func envFetch() PostgreSQLConfig {
 	return PostgreSQLConfig{
-		Host:     getEnv("DB_HOST", "localhost"),
-		Port:     getEnv("DB_PORT", strconv.Itoa(5432)),
-		User:     getEnv("DB_USER", "root"),
-		Password: getEnv("DB_PASSWORD", "password"),
-		DBName:   getEnv("DB_NAME", "org-db"),
+		Host:     getEnv("PGHOST", "localhost"),
+		Port:     getEnv("PGPORT", strconv.Itoa(5432)),
+		User:     getEnv("PGUSER", "root"),
+		Password: getEnv("PGPASSWORD", "password"),
+		DBName:   getEnv("PGDATABASE", "org-db"),
 	}
 }
 
