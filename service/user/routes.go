@@ -33,7 +33,15 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	// handle register
 	var payload types.RegisterUserPayload
 	if err := utils.ReadJSON(r, &payload); err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, err)
+		utils.WriteJSON(w, http.StatusBadRequest, struct {
+			Status     string `json:"status"`
+			Message    string `json:"message"`
+			StatusCode int    `json:"statusCode"`
+		}{
+			Status:     "Bad request",
+			Message:    "Registration unsuccessful",
+			StatusCode: http.StatusBadRequest,
+		})
 		return
 	}
 
@@ -56,26 +64,46 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := types.User{
-		Email:     payload.Email,
+	// Creae a new user object
+	newUser := types.User{
 		FirstName: payload.FirstName,
 		LastName:  payload.LastName,
+		Email:     payload.Email,
 		Password:  hashedPassword,
 		Phone:     payload.Phone,
 	}
 
-	err = h.storage.CreateUser(user)
+	err = h.storage.CreateUser(newUser)
 	if err != nil {
 		utils.WriteJSON(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, "user created successfully")
+	accessToken := "temporary_token" // TBD
+
+	// Successful response
+	response := struct {
+		Status  string      `json:"status"`
+		Message string      `json:"message"`
+		Data    interface{} `json:"data"`
+	}{
+		Status:  "success",
+		Message: "Registration successful",
+		Data: struct {
+			AccessToken string     `json:"accessToken"`
+			User        types.User `json:"user"`
+		}{
+			AccessToken: accessToken,
+			User:        newUser, // Return the created user details
+		},
+	}
+
+	utils.WriteJSON(w, http.StatusCreated, response)
 }
 
 func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	str, ok := vars["userID"]
+	params := mux.Vars(r)
+	str, ok := params["userId"]
 	if !ok {
 		utils.WriteJSON(w, http.StatusBadRequest, fmt.Errorf("missing user ID"))
 		return
@@ -89,9 +117,40 @@ func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.storage.GetUserByID(userID)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusInternalServerError, err)
+		utils.WriteJSON(w, http.StatusNotFound, struct {
+			Status     string `json:"status"`
+			Message    string `json:"message"`
+			StatusCode int    `json:"statusCode"`
+		}{
+			Status:     "Not found",
+			Message:    "User not found",
+			StatusCode: http.StatusNotFound,
+		})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, user)
+	// Prepare successful response
+	response := struct {
+		Status  string      `json:"status"`
+		Message string      `json:"message"`
+		Data    interface{} `json:"data"`
+	}{
+		Status:  "success",
+		Message: "User details retrieved successfully",
+		Data: struct {
+			UserID    string `json:"userId"`
+			FirstName string `json:"firstName"`
+			LastName  string `json:"lastName"`
+			Email     string `json:"email"`
+			Phone     string `json:"phone"`
+		}{
+			UserID:    strconv.Itoa(user.ID), // Convert user.ID to string
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+			Phone:     user.Phone,
+		},
+	}
+
+	utils.WriteJSON(w, http.StatusOK, response)
 }
