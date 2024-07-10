@@ -21,7 +21,7 @@ func NewOrganisationHandler(storage types.OrganisationStorage) *OrganisationHand
 func (h *OrganisationHandler) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc("/organisations", h.GetAllOrganisations).Methods("GET")
 	r.HandleFunc("/organisations/{orgId}", h.GetOrganisationByID).Methods("GET")
-	r.HandleFunc("/organisations/create", h.CreateOrganisation).Methods("POST")
+	r.HandleFunc("/organisations", h.CreateOrganisation).Methods("POST")
 	r.HandleFunc("/organisations/{orgId}/users", h.AddUserToOrganisation).Methods("POST")
 }
 

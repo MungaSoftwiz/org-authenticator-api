@@ -22,7 +22,8 @@ func NewHandler(storage types.UserStorage) *Handler {
 
 func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/auth/login", h.handleLogin).Methods("POST")
-	router.HandleFunc("/register", h.handleRegister).Methods("POST")
+	router.HandleFunc("/auth/register", h.handleRegister).Methods("POST")
+	router.HandleFunc("/api/users/{userId}", h.handleGetUser).Methods("GET")
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
