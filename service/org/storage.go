@@ -26,7 +26,7 @@ func (s *OrganisationStorage) GetOrganisationByID(orgID string) (*types.Organisa
 }
 
 func (s *OrganisationStorage) CreateOrganisation(organisation types.Organisation) error {
-	_, err := s.db.NamedExec(`INSERT INTO organisations (orgId, name, description) VALUES (:org_id, :name, :description)`, organisation)
+	_, err := s.db.NamedExec(`INSERT INTO organisations (orgId, name, description) VALUES (:orgId, :name, :description)`, organisation)
 	return err
 }
 

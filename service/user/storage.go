@@ -15,7 +15,7 @@ func NewStorage(db *sqlx.DB) *Storage {
 
 // User model methods
 func (s *Storage) CreateUser(user types.User) error {
-	_, err := s.db.Exec("INSERT INTO users (firstName, lastName, email, password, phone) VALUES (?, ?, ?, ?, ?)", user.FirstName, user.LastName, user.Email, user.Password, user.Phone)
+	_, err := s.db.Exec("INSERT INTO users (firstName, lastName, email, password, phone) VALUES ($1, $2, $3, $4, $5)", user.FirstName, user.LastName, user.Email, user.Password, user.Phone)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func (s *Storage) GetUserByEmail(email string) (*types.User, error) {
 
 func (s *Storage) GetUserByID(id int) (*types.User, error) {
 	u := new(types.User)
-	err := s.db.Get(u, "SELECT * FROM users WHERE id = ?", id)
+	err := s.db.Get(u, "SELECT * FROM users WHERE userId = $1", id)
 	if err != nil {
 		return nil, err
 	}
