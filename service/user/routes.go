@@ -95,7 +95,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 			Message    string `json:"message"`
 			StatusCode int    `json:"statusCode"`
 		}{
-			status:     "Bad request",
+			Status:     "Bad request",
 			Message:    "Registration unsuccessful",
 			StatusCode: http.StatusBadRequest,
 		})
