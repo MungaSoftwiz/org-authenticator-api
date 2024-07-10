@@ -138,22 +138,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//
-	createdUser, err := h.storage.GetUserByEmail(payload.Email)
-	if err != nil {
-		utils.WriteJSON(w, http.StatusInternalServerError, struct {
-			Status     string `json:"status"`
-			Message    string `json:"message"`
-			StatusCode int    `json:"statusCode"`
-		}{
-			Status:     "error",
-			Message:    "Internal Server Error",
-			StatusCode: http.StatusInternalServerError,
-		})
-		return
-	}
-
-	token, err := auth.GenerateToken(strconv.Itoa(createdUser.ID))
+	token, err := auth.GenerateToken(strconv.Itoa(newUser.ID))
 	if err != nil {
 		utils.WriteJSON(w, http.StatusInternalServerError, map[string]interface{}{
 			"status":     "error",
