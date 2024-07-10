@@ -25,7 +25,7 @@ func (s *APIServer) Run() error {
 
 	userStorage := user.NewStorage(sqlx.NewDb(s.db.DB, "postgres"))
 	userHandler := user.NewHandler(userStorage)
-	userHandler.RegisterRoutes(subrouter)
+	userHandler.RegisterRoutes(subrouter.PathPrefix("").Subrouter())
 
 	organisationStorage := org.NewOrganisationStorage(s.db)
 	organisationHandler := org.NewOrganisationHandler(organisationStorage)
