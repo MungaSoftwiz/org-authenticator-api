@@ -95,7 +95,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 			Message    string `json:"message"`
 			StatusCode int    `json:"statusCode"`
 		}{
-			Status:     "Bad request",
+			status:     "Bad request",
 			Message:    "Registration unsuccessful",
 			StatusCode: http.StatusBadRequest,
 		})
@@ -109,6 +109,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check if user already exists
 	_, err := h.storage.GetUserByEmail(payload.Email)
 	if err == nil {
 		utils.WriteJSON(w, http.StatusBadRequest, "user already exists")
@@ -130,13 +131,22 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		Phone:     payload.Phone,
 	}
 
+	// save the new user to the database
 	err = h.storage.CreateUser(newUser)
 	if err != nil {
 		utils.WriteJSON(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	accessToken := "temporary_token" // TBD
+	token, err := auth.GenerateToken(strconv.Itoa(user.ID))
+	if err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, map[string]interface{}{
+			"status":     "error",
+			"message":    "Could not generate token",
+			"statusCode": 500,
+		})
+		return
+	}
 
 	// Successful response
 	response := struct {
@@ -150,8 +160,8 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 			AccessToken string     `json:"accessToken"`
 			User        types.User `json:"user"`
 		}{
-			AccessToken: accessToken,
-			User:        newUser, // Return the created user details
+			AccessToken: token,
+			User:        newUser,
 		},
 	}
 
