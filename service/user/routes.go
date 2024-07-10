@@ -49,11 +49,21 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := h.storage.GetUserByEmail(payload.Email)
-	if err != nil || !auth.CheckPasswordHash(payload.Password, user.Password) {
+	if err != nil {
+		utils.WriteJSON(w, http.StatusNotFound, map[string]interface{}{
+			"status":     "Not found",
+			"message":    "User not found",
+			"statusCode": http.StatusNotFound,
+		})
+		return
+	}
+
+	// check if password match
+	if !auth.CheckPasswordHash(payload.Password, user.Password) {
 		utils.WriteJSON(w, http.StatusUnauthorized, map[string]interface{}{
-			"status":     "Bad request",
-			"message":    "Authentication failed",
-			"statusCode": 401,
+			"status":     "Unauthorized",
+			"message":    "Invalid credentials",
+			"statusCode": http.StatusUnauthorized,
 		})
 		return
 	}
