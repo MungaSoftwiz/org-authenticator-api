@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -58,6 +59,8 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("User found: %+v\n", user)
+
 	// check if password match
 	if !auth.CheckPasswordHash(payload.Password, user.Password) {
 		utils.WriteJSON(w, http.StatusUnauthorized, map[string]interface{}{
@@ -77,6 +80,8 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+
+	log.Printf("Login successful for user with email %s\n", payload.Email)
 
 	response := map[string]interface{}{
 		"status":  "success",
