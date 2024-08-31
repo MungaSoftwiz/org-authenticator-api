@@ -13,6 +13,8 @@ require (
 	golang.org/x/crypto v0.25.0
 )
 
+require github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+
 require (
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
