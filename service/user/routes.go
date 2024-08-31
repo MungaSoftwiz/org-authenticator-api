@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/MungaSoftwiz/org-authenticator-api/config"
 	"github.com/MungaSoftwiz/org-authenticator-api/service/auth"
 	"github.com/MungaSoftwiz/org-authenticator-api/types"
 	"github.com/MungaSoftwiz/org-authenticator-api/utils"
@@ -71,7 +72,8 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := auth.GenerateToken(strconv.Itoa(user.ID))
+	secret := []byte(config.Env.JWTSecret)
+	token, err := auth.GenerateToken(secret, user.ID)
 	if err != nil {
 		utils.WriteJSON(w, http.StatusInternalServerError, map[string]interface{}{
 			"status":     "error",
@@ -105,35 +107,27 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	// handle register
 	var payload types.RegisterUserPayload
 	if err := utils.ReadJSON(r, &payload); err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, struct {
-			Status     string `json:"status"`
-			Message    string `json:"message"`
-			StatusCode int    `json:"statusCode"`
-		}{
-			Status:     "Bad request",
-			Message:    "Registration unsuccessful",
-			StatusCode: http.StatusBadRequest,
-		})
+		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
 	// validate the payload
 	if err := utils.Validate.Struct(&payload); err != nil {
 		errors := err.(validator.ValidationErrors)
-		utils.WriteJSON(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
 		return
 	}
 
 	// check if user already exists
 	_, err := h.storage.GetUserByEmail(payload.Email)
 	if err == nil {
-		utils.WriteJSON(w, http.StatusBadRequest, "user already exists")
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s already exists", payload.Email))
 		return
 	}
 
 	hashedPassword, err := auth.HashPassword(payload.Password)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusInternalServerError, err)
+		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -149,17 +143,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	// save the new user to the database
 	err = h.storage.CreateUser(newUser)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	token, err := auth.GenerateToken(strconv.Itoa(newUser.ID))
-	if err != nil {
-		utils.WriteJSON(w, http.StatusInternalServerError, map[string]interface{}{
-			"status":     "error",
-			"message":    "Could not generate token",
-			"statusCode": 500,
-		})
+		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -172,10 +156,8 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		Status:  "success",
 		Message: "Registration successful",
 		Data: struct {
-			AccessToken string     `json:"accessToken"`
 			User        types.User `json:"user"`
 		}{
-			AccessToken: token,
 			User:        newUser,
 		},
 	}
@@ -187,27 +169,19 @@ func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	str, ok := params["userId"]
 	if !ok {
-		utils.WriteJSON(w, http.StatusBadRequest, fmt.Errorf("missing user ID"))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("missing user ID"))
 		return
 	}
 
 	userID, err := strconv.Atoi(str)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, fmt.Errorf("invalid user ID"))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid user ID"))
 		return
 	}
 
 	user, err := h.storage.GetUserByID(userID)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusNotFound, struct {
-			Status     string `json:"status"`
-			Message    string `json:"message"`
-			StatusCode int    `json:"statusCode"`
-		}{
-			Status:     "Not found",
-			Message:    "User not found",
-			StatusCode: http.StatusNotFound,
-		})
+		utils.WriteJSON(w, http.StatusNotFound, err)
 		return
 	}
 
@@ -226,7 +200,7 @@ func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 			Email     string `json:"email"`
 			Phone     string `json:"phone"`
 		}{
-			UserID:    strconv.Itoa(user.ID), // Convert user.ID to string
+			UserID:    strconv.Itoa(user.ID),
 			FirstName: user.FirstName,
 			LastName:  user.LastName,
 			Email:     user.Email,
