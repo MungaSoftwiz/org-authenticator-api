@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     "phone" VARCHAR(20) NOT NULL
 );
 
-CREATE TABLE organisations (
+CREATE TABLE IF NOT EXISTS organisations (
     "orgId" VARCHAR(255) PRIMARY KEY,
     "name" VARCHAR(255) NOT NULL,
     "description" TEXT
