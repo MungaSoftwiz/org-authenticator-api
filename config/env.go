@@ -14,6 +14,7 @@ type PostgreSQLConfig struct {
 	User     string
 	Password string
 	DBName   string
+	JWTSecret string
 }
 
 var Env = initConfig()
@@ -33,6 +34,7 @@ func envFetch() PostgreSQLConfig {
 		User:     getEnv("PGUSER", "root"),
 		Password: getEnv("PGPASSWORD", "password"),
 		DBName:   getEnv("PGDATABASE", "org-db"),
+		JWTSecret: getEnv("JWT_SECRET", "secret"),
 	}
 }
 
