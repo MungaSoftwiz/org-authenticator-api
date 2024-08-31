@@ -156,9 +156,9 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		Status:  "success",
 		Message: "Registration successful",
 		Data: struct {
-			User        types.User `json:"user"`
+			User types.User `json:"user"`
 		}{
-			User:        newUser,
+			User: newUser,
 		},
 	}
 

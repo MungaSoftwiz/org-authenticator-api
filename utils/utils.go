@@ -30,7 +30,7 @@ func WriteError(w http.ResponseWriter, status int, err error) {
 func GetTokenFromUserRequest(r *http.Request) string {
 	tokenAuth := r.Header.Get("Authorization")
 	tokenQuery := r.URL.Query().Get("token")
-	
+
 	if tokenAuth != "" {
 		return tokenAuth
 	}

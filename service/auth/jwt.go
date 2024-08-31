@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/MungaSoftwiz/org-authenticator-api/config"
 	"github.com/MungaSoftwiz/org-authenticator-api/types"
 	"github.com/MungaSoftwiz/org-authenticator-api/utils"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type contextKey string
@@ -22,8 +22,8 @@ func GenerateToken(jwtKey []byte, userID int) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID": strconv.Itoa(userID),
-		"expiresAt":    expirationTime.Unix(),
+		"userID":    strconv.Itoa(userID),
+		"expiresAt": expirationTime.Unix(),
 	})
 	return token.SignedString(jwtKey)
 }

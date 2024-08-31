@@ -9,11 +9,11 @@ import (
 )
 
 type PostgreSQLConfig struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	DBName   string
+	Host      string
+	Port      string
+	User      string
+	Password  string
+	DBName    string
 	JWTSecret string
 }
 
@@ -29,11 +29,11 @@ func initConfig() PostgreSQLConfig {
 
 func envFetch() PostgreSQLConfig {
 	return PostgreSQLConfig{
-		Host:     getEnv("PGHOST", "localhost"),
-		Port:     getEnv("PGPORT", strconv.Itoa(5432)),
-		User:     getEnv("PGUSER", "root"),
-		Password: getEnv("PGPASSWORD", "password"),
-		DBName:   getEnv("PGDATABASE", "org-db"),
+		Host:      getEnv("PGHOST", "localhost"),
+		Port:      getEnv("PGPORT", strconv.Itoa(5432)),
+		User:      getEnv("PGUSER", "root"),
+		Password:  getEnv("PGPASSWORD", "password"),
+		DBName:    getEnv("PGDATABASE", "org-db"),
 		JWTSecret: getEnv("JWT_SECRET", "secret"),
 	}
 }
